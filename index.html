@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="graphs.js"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1', {packages: ['corechart']});
+      google.load("jquery", "1.4.2");
+    </script>
+  </head>
+  <body>
+  <div id='lineChart' width='500px' height='500px'></div>
+  <div id='controlChart' width='500px' height='500px'></div>
+  <div id='rangeChart' width='500px' height='500px'></div>
+  <div id='compliancePerQuestionnaire' width='500px' height='500px'></div>
+  <div id='correctiveActionsCount' width='500px' height='500px'></div>
+
+
+
+  <script type="text/javascript">
+    drawLineChart([{'date': "2015-09-05", 'parts_inspected': 3}, {'date': "2015-09-06", 'parts_inspected': 1}], 'lineChart');
+
+    drawObservationsByShiftChart([{'date': "2015-09-05", 'observation': 3, "spec_max": 5, "spec_min": 1, "nominal": 3, "ucl": 4, "lcl": 2}, {'date': "2015-09-05", 'observation': 1, "spec_max": 5, "spec_min": 1, "nominal": 3, "ucl": 4, "lcl": 2}], 'controlChart');
+
+    drawRangeChart([{'date': "2015-09-05", 'range': 3}, {'date': "2015-09-06", 'range': 1}], 'rangeChart');
+
+    drawCompliancePerQuestionnaire([{'questionnaire': "A Questionnaire", 'compliance': 3}, {'questionnaire': "New Questionnaire", 'compliance': 10}], "compliancePerQuestionnaire");
+
+    drawCorrectiveActionsCount({"openCount": 1, "closedCount": 2, "notAssignedCount": 3, "overdueCount": 4}, "correctiveActionsCount");
+
+
+
+  </script>
+  </body>
+</html>
