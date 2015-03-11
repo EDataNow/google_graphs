@@ -21,8 +21,8 @@ function firstElementByID(elementId) {
 
 function drawSuspectsPerDayChart(data, elementId) {
   var line_data = new google.visualization.DataTable();
-  line_data.addColumn('string', I18n.t('javascript_export.date'));
-  line_data.addColumn('number', I18n.t('javascript_export.suspects'));
+  line_data.addColumn('string', "Date");
+  line_data.addColumn('number', "Suspects");
 
   for(var i=0;i<data.length;i++) {
     var row = [data[i].date, data[i].suspects];
@@ -32,13 +32,12 @@ function drawSuspectsPerDayChart(data, elementId) {
   var trendStartDate = data[0].date;
   var trendEndDate = data[data.length - 1].date;
 
-  var title = (elementId == "trend_chart") ? I18n.t("javascript_export.suspect_trend") :
-                     I18n.t("javascript_export.suspects_per_day", {startDate: trendStartDate, endDate: trendEndDate});
+  var title = (elementId == "trend_chart") ? "Suspect Trend" : "Suspects per Day";
 
   var line_chart = new google.visualization.LineChart(firstElementByID(elementId));
   line_chart.draw(
     line_data,
-    $.extend(defaultDrawData(title, I18n.t("javascript_export.quantity_suspect"), I18n.t("javascript_export.day")),
+    $.extend(defaultDrawData(title, "Quantity Suspect", "Day"),
       {
         pointSize: 7,
         hAxis: {
@@ -52,8 +51,8 @@ function drawSuspectsPerDayChart(data, elementId) {
 
 function drawDefectsByDescriptionBarChart(data, elementId) {
   var bar_data = new google.visualization.DataTable();
-  bar_data.addColumn('string', I18n.t('javascript_export.suspect_code'));
-  bar_data.addColumn('number', I18n.t('javascript_export.quantity'));
+  bar_data.addColumn('string', "Suspect Code");
+  bar_data.addColumn('number', "Quantity");
 
   for(var i=0;i<data.length;i++) {
     var row = [ data[i].description.toLowerCase(), data[i].suspects ];
@@ -63,13 +62,14 @@ function drawDefectsByDescriptionBarChart(data, elementId) {
   var bar_chart = new google.visualization.ColumnChart(firstElementByID(elementId));
   bar_chart.draw(
     bar_data,
-    defaultDrawData(I18n.t("javascript_export.quantity_per_suspect_code"), I18n.t("javascript_export.quantity"), I18n.t("javascript_export.suspect_code"))
+    defaultDrawData("Quantity per Suspect Code", "Quantity", "Suspect Code")
   );
 }
 
 function drawDefectsByDescriptionPeriodColumnChart(data, periodNames, elementId) {
   var bar_data = new google.visualization.DataTable();
-  bar_data.addColumn('string', I18n.t('javascript_export.suspect_code'));
+  bar_data.addColumn('string', "Suspect Code");
+
   for(var i=0;i<periodNames.length;i++) {
     bar_data.addColumn('number', periodNames[i]);
   }
@@ -82,7 +82,7 @@ function drawDefectsByDescriptionPeriodColumnChart(data, periodNames, elementId)
   var bar_chart = new google.visualization.ColumnChart(firstElementByID(elementId));
   bar_chart.draw(
     bar_data,
-    $.extend(defaultDrawData(I18n.t("javascript_export.quantity_per_suspect_code"), I18n.t("javascript_export.quantity"), I18n.t("javascript_export.suspect_code")),
+    $.extend(defaultDrawData("Quantity per Suspect Code", "Quantity", "Suspect Code"),
       {
         legend: {
           position: 'right',
@@ -99,29 +99,29 @@ function getDateTimeWithNoOffset(dateString) {
   return date;
 }
 
-function drawCompliancePerDay(elementClass) {
+function drawCompliancePerDay(theData, expectedCompliance, elementClass) {
   // I18n labels
-  var dayLabel = I18n.t("javascript_export.day");
-  var complianceLabel = I18n.t("javascript_export.compliance_lc");
-  var expectedComplianceLabel = I18n.t("javascript_export.expected_compliance");
-  var compliancePercentLabel = I18n.t("javascript_export.compliance_percent");
+  var dayLabel = "Day";
+  var complianceLabel = "Compliance";
+  var expectedComplianceLabel = "Expected Compliance";
+  var compliancePercentLabel = "Compliance Percent";
 
-  elementClass = "." + elementClass;
+  elementClass = "#" + elementClass;
 
-  var compliancePercents = $(elementClass).next(".daily_breakdown").find(".compliance_percent")
-                                          .map(function(){ return $(this).text(); }).get();
+  // var compliancePercents = $(elementClass).next(".daily_breakdown").find(".compliance_percent")
+  //                                         .map(function(){ return $(this).text(); }).get();
 
-  var days = $(elementClass).next(".daily_breakdown").find(".day")
-                                          .map(function(){ return getDateTimeWithNoOffset($(this).text()); }).get();
+  // var days = $(elementClass).next(".daily_breakdown").find(".day")
+  //                                         .map(function(){ return getDateTimeWithNoOffset($(this).text()); }).get();
 
-  var dailyData = $(elementClass).next(".daily_breakdown").find(".day").map(function(index){
-                                    return {
-                                              day: getDateTimeWithNoOffset($(this).text()),
-                                              compliance: parseFloat(compliancePercents[index].slice(0,-1))
-                                            };
-                                  }).get();
+  // var dailyData = $(elementClass).next(".daily_breakdown").find(".day").map(function(index){
+  //                                   return {
+  //                                             day: getDateTimeWithNoOffset($(this).text()),
+  //                                             compliance: parseFloat(compliancePercents[index].slice(0,-1))
+  //                                           };
+  //                                 }).get();
 
-  var expectedCompliance = parseFloat($(elementClass).attr("data-expected_compliance"));
+  // var expectedCompliance = parseFloat($(elementClass).attr("data-expected_compliance"));
 
   var data = new google.visualization.DataTable();
 
@@ -129,10 +129,12 @@ function drawCompliancePerDay(elementClass) {
   data.addColumn("number", complianceLabel);
   data.addColumn("number", expectedComplianceLabel);
 
-  if (dailyData.length > 0) {
-    dailyData.forEach(function(object) {
+  if (theData.length > 0) {
+    theData.forEach(function(object) {
       data.addRow([object.day, object.compliance, expectedCompliance]);
     });
+
+    var days = theData.map(function(data) { return data.day });
 
     var options = {
       series: {
@@ -166,26 +168,26 @@ function drawCompliancePerDay(elementClass) {
   }
 }
 
-function drawComplianceByMonthZone(elementClass) {
-  var compliancePercentLabel = I18n.t("javascript_export.compliance_percent");
-  var zoneLabel = I18n.t("zone");
+function drawComplianceByMonthZone(theData, elementClass) {
+  var compliancePercentLabel = "Compliance Percent";
+  var zoneLabel = "Zone";
 
   elementClass = "#" + elementClass;
-  var monthData = $(elementClass).next("table").find(".month_data");
+  // var monthData = $(elementClass).next("table").find(".month_data");
 
-  var compliance = monthData.map(function() {
-    return {
-              zone: $(this).find(".zone").text(),
-              compliance: parseFloat($(this).find(".compliance_percent").attr("data-compliance-percent"))
-           };
-  }).get();
+  // var compliance = monthData.map(function() {
+  //   return {
+  //             zone: $(this).find(".zone").text(),
+  //             compliance: parseFloat($(this).find(".compliance_percent").attr("data-compliance-percent"))
+  //          };
+  // }).get();
 
   var data = new google.visualization.DataTable();
   data.addColumn("string", zoneLabel);
   data.addColumn("number", compliancePercentLabel);
 
-  if(compliance.length > 0) {
-    compliance.forEach(function(object) {
+  if(theData.length > 0) {
+    theData.forEach(function(object) {
       data.addRow([object.zone, object.compliance]);
     });
 
@@ -205,10 +207,10 @@ function drawComplianceByMonthZone(elementClass) {
   }
 
 }
-function drawScheduledQuestionnaireComplianceBarChart(elementClass) {
-  elementClass = "." + elementClass;
+function drawScheduledQuestionnaireComplianceBarChart(data, elementClass) {
+  elementClass = "#" + elementClass;
 
-  var data = $.parseJSON($(elementClass).attr("data-scheduled-compliances"));
+  // var data = $.parseJSON($(elementClass).attr("data-scheduled-compliances"));
   var breakdowns = data.breakdowns;
   var totalScheduled = data.total_scheduled;
   var totalIncomplete = data.total_incomplete;
@@ -216,9 +218,9 @@ function drawScheduledQuestionnaireComplianceBarChart(elementClass) {
 
   var total_completion_compliance = Math.round((totalComplete / totalScheduled) * 100, 2);
 
-  var intervalLabel = I18n.t("javascript_export.interval");
-  var scheduledLabel = I18n.t("javascript_export.scheduled");
-  var incompleteLabel = I18n.t("javascript_export.incomplete");
+  var intervalLabel = "Interval";
+  var scheduledLabel = "Scheduled";
+  var incompleteLabel = "Incomplete";
 
   var chartData = new google.visualization.DataTable();
 
@@ -233,7 +235,7 @@ function drawScheduledQuestionnaireComplianceBarChart(elementClass) {
 
   var barChart = new google.visualization.ColumnChart($(elementClass)[0]);
 
-  var legendTitle = I18n.t("javascript_export.completion_compliance_of_percent", {compliance: total_completion_compliance, completed: totalComplete, scheduled: totalScheduled});
+  var legendTitle = "Total Compliance";
 
   var options = {
     title: legendTitle,
@@ -244,17 +246,17 @@ function drawScheduledQuestionnaireComplianceBarChart(elementClass) {
   barChart.draw(chartData, options);
 }
 
-function drawCorrectiveActionsCountBarChart(elementClass, optionalTitle) {
-  elementClass = "." + elementClass;
+function drawCorrectiveActionsCountBarChart(data, elementClass, optionalTitle) {
+  elementClass = "#" + elementClass;
 
-  var data = $.parseJSON($(elementClass).attr("data-corrective-action-data"));
+  // var data = $.parseJSON($(elementClass).attr("data-corrective-action-data"));
 
   // I18n labels
-  var monthLabel = I18n.t("javascript_export.month");
-  var openCountLabel = I18n.t("javascript_export.open_count");
-  var closedCountLabel = I18n.t("javascript_export.closed_count");
-  var notAssignedCountLabel = I18n.t("javascript_export.not_assigned_count");
-  var overdueCountLabel = I18n.t("javascript_export.overdue_count");
+  var monthLabel = "Month";
+  var openCountLabel = "Open Count";
+  var closedCountLabel = "Closed Count";
+  var notAssignedCountLabel = "Not Assigned Count";
+  var overdueCountLabel = "Overdue Count";
 
   var chartData = new google.visualization.DataTable();
   chartData.addColumn("string", monthLabel);
@@ -263,7 +265,7 @@ function drawCorrectiveActionsCountBarChart(elementClass, optionalTitle) {
   chartData.addColumn("number", notAssignedCountLabel);
   chartData.addColumn("number", overdueCountLabel);
 
-  $.each(data.table, (function(month, monthData) {
+  $.each(data, (function(month, monthData) {
     chartData.addRow([month, monthData.open_count, monthData.closed_count,
                       monthData.not_assigned_count, monthData.overdue_count]);
   }));
