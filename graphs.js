@@ -32,7 +32,7 @@ function drawSuspectsPerDayChart(data, elementId) {
   var trendStartDate = data[0].date;
   var trendEndDate = data[data.length - 1].date;
 
-  var title = (elementId == "trend_chart") ? "Suspect Trend" : "Suspects per Day";
+  var title = "Suspect Trend"
 
   var line_chart = new google.visualization.LineChart(firstElementByID(elementId));
   line_chart.draw(
@@ -83,7 +83,7 @@ function drawDefectsByDescriptionPeriodColumnChart(data, periodNames, elementId)
   var bar_chart = new google.visualization.ColumnChart(firstElementByID(elementId));
   bar_chart.draw(
     bar_data,
-    $.extend(defaultDrawData("Quantity per Suspect Code", "Quantity", "Suspect Code"),
+    $.extend(defaultDrawData("Quantity per Suspect", "Quantity", "Suspect Code"),
       {
         legend: {
           position: 'right',
