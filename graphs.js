@@ -76,6 +76,7 @@ function drawDefectsByDescriptionPeriodColumnChart(data, periodNames, elementId)
 
   for(var j=0;j<data.length;j++) {
     var row = [ data[j].suspect_code.toLowerCase() ].concat(data[j].suspects);
+
     bar_data.addRow(row);
   }
 
